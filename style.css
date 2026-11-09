@@ -1,0 +1,509 @@
+/**********Step 0 ***********/
+body {
+    font-family: Garamond, sans-serif;
+    margin: 40px;
+    
+}
+
+h1 {
+    text-align: center;
+    color: rgb(180, 70, 156);
+}
+h3 {
+    text-align: center;
+    color: rgb(215, 114, 200);
+}
+h2 {
+    color: rgb(110, 89, 106);
+}
+p {
+    color: rgb(110, 89, 106);
+}
+
+
+
+/**********Step 2 ***********/
+/************* Style for the chart *************/
+/* Main chart container */
+#chart {
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+/* Display the current year */
+#year-display {
+    display: block;
+    text-align: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: rgb(180, 70, 156);
+    margin-bottom: 10px;
+}
+
+/* Make the SVG responsive */
+#bubble-chart svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+}
+
+/* Style the axis labels */
+.axis-label {
+    font-family: Garamond, serif;
+    font-size: 15px;
+    fill: rgb(110, 89, 106);
+}
+
+/* Style the axis tick labels */
+.tick text {
+    font-family: Garamond, serif;
+    font-size: 12px;
+    fill: rgb(110, 89, 106);
+}
+
+/* Make the gridlines subtle */
+.grid line {
+    stroke: #999;
+    stroke-opacity: 0.18;
+}
+
+/* Remove the outer axis line */
+.domain {
+    stroke: #aaa;
+}
+
+/* Style the region legend */
+#legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin: 20px 0;
+}
+
+/* Each legend item */
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgb(110, 89, 106);
+    font-size: 15px;
+}
+
+/* Legend color circles */
+.legend-color {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+}
+
+/* Large year displayed in the background */
+.background-year {
+  font-size: 150px;
+  font-weight: bold;
+  fill: rgb(180, 70, 156);
+  opacity: 0.35;
+  pointer-events: none;
+}
+/********** Step 3: year animation controls ***********/
+.year-controls,
+.measure-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: rgb(110, 89, 106);
+}
+
+.year-controls {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+#year-slider {
+    flex: 1;
+    min-width: 80px;
+    min-height: 44px;
+    accent-color: rgb(180, 70, 156);
+    cursor: pointer;
+}
+
+button,
+select {
+    min-height: 44px;
+    padding: 8px 16px;
+    border: 1px solid rgb(180, 70, 156);
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+}
+
+#play-pause {
+    min-width: 88px;
+    color: white;
+    background: #90377d;
+}
+
+#play-pause:hover:not(:disabled) {
+    background: #742a64;
+}
+
+button:disabled,
+select:disabled,
+input:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+.country-bubble:focus-visible {
+    outline: 3px solid #703964;
+    outline-offset: 4px;
+}
+
+.chart-note {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/********** Step 4: measure selector ***********/
+.measure-controls {
+    margin-top: 24px;
+}
+
+#measure-select {
+    color: #593f55;
+    background: white;
+    max-width: 100%;
+}
+
+.empty-message {
+    fill: rgb(110, 89, 106);
+    font-size: 16px;
+    text-anchor: middle;
+}
+
+/********** Step 5: tooltips, highlighting and region filters ***********/
+.measure-controls {
+    flex-wrap: wrap;
+    gap: 12px 28px;
+}
+
+.control-pair {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#highlight-select {
+    color: #593f55;
+    background: white;
+    max-width: 100%;
+}
+
+/* Legend items are toggle buttons */
+#legend .legend-item {
+    min-height: 44px;
+    padding: 6px 16px;
+    background: white;
+    border: 1px solid rgb(225, 200, 220);
+    border-radius: 999px;
+    color: rgb(110, 89, 106);
+    font-size: 15px;
+}
+
+#legend .legend-item:hover {
+    border-color: rgb(180, 70, 156);
+}
+
+.legend-color {
+    box-sizing: border-box;
+    border: 2px solid;
+}
+
+#legend .legend-item[aria-pressed="false"] {
+    opacity: 0.55;
+}
+
+#legend .legend-item[aria-pressed="false"] .legend-color {
+    background-color: transparent !important;
+}
+
+#legend .legend-item[aria-pressed="false"] .legend-label {
+    text-decoration: line-through;
+}
+
+.interaction-hint {
+    margin-top: 0;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* Dim other countries while one is hovered or highlighted */
+.country-bubble {
+    transition: opacity 0.15s;
+}
+
+.bubbles.has-focus .country-bubble:not(.is-focus) {
+    opacity: 0.18;
+}
+
+/* No browser focus box when a bubble is clicked with the mouse.
+   Keyboard users still get the :focus-visible outline. */
+.country-bubble:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.country-bubble.is-focus,
+.country-bubble.is-pinned {
+    stroke: #3d2438;
+    stroke-width: 2.5px;
+}
+
+.country-label {
+    font-family: Garamond, serif;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #3d2438;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: white;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* Tooltip */
+.chart-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 270px;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid rgb(225, 200, 220);
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(60, 30, 55, 0.15);
+    font-family: Garamond, serif;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #4a3546;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.12s;
+}
+
+.chart-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tt-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.tt-country {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.tt-meta,
+.tt-note {
+    font-size: 12px;
+    color: #8a7385;
+}
+
+.tt-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    border-radius: 50%;
+}
+
+.tt-main {
+    margin: 6px 0;
+}
+
+.tt-main strong {
+    font-size: 19px;
+    color: rgb(180, 70, 156);
+}
+
+.tt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tt-table td {
+    padding: 1px 0;
+}
+
+.tt-table td:last-child {
+    padding-left: 10px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tt-note {
+    margin-top: 4px;
+}
+
+/********** Step 6: key findings and linked line chart ***********/
+#story {
+    max-width: 860px;
+    margin: 0 auto 36px;
+    padding: 20px 24px;
+    background: #fbf5fa;
+    border: 1px solid rgb(235, 215, 230);
+    border-radius: 12px;
+    text-align: center;
+}
+
+#story h2 {
+    margin: 0 0 14px;
+    font-size: 22px;
+}
+
+#story-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.story-button {
+    min-height: 44px;
+    padding: 8px 16px;
+    color: #90377d;
+    background: white;
+    border: 1px solid rgb(180, 70, 156);
+    border-radius: 999px;
+    font-size: 15px;
+}
+
+.story-button:hover {
+    background: #f6e6f2;
+}
+
+.story-button[aria-pressed="true"] {
+    color: white;
+    background: #90377d;
+}
+
+.story-caption {
+    min-height: 3em;
+    margin: 16px auto 0;
+    max-width: 700px;
+    font-size: 17px;
+    line-height: 1.5;
+    color: #4a3546;
+}
+
+.story-reset {
+    margin-top: 10px;
+    color: #593f55;
+    background: white;
+    font-size: 14px;
+}
+
+.line-title {
+    margin-top: 48px;
+    text-align: center;
+}
+
+#line-chart svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+}
+
+.line-background {
+    fill: transparent;
+    cursor: crosshair;
+}
+
+.country-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-opacity: 0.6;
+    pointer-events: none;
+    transition: stroke-opacity 0.15s, stroke-width 0.15s;
+}
+
+.line-hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 12;
+    cursor: pointer;
+}
+
+.lines.has-focus .country-line-group:not(.is-focus) .country-line {
+    stroke-opacity: 0.12;
+}
+
+.country-line-group.is-focus .country-line {
+    stroke-opacity: 1;
+    stroke-width: 3.5;
+}
+
+.year-marker {
+    stroke: rgb(180, 70, 156);
+    stroke-width: 2;
+    stroke-opacity: 0.5;
+    pointer-events: none;
+}
+
+.line-label {
+    font-family: Garamond, serif;
+    font-size: 14px;
+    font-weight: bold;
+    paint-order: stroke;
+    stroke: white;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* Write-up */
+#writeup {
+    max-width: 760px;
+    margin: 72px auto 40px;
+    padding-top: 32px;
+    border-top: 1px solid rgb(235, 215, 230);
+}
+
+#writeup h2 {
+    text-align: center;
+    color: rgb(180, 70, 156);
+}
+
+#writeup h3 {
+    margin: 32px 0 8px;
+    color: rgb(110, 89, 106);
+    font-size: 20px;
+}
+
+#writeup p {
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+    body { margin: 20px 16px; }
+    .year-controls { flex-wrap: wrap; gap: 8px; }
+    #year-slider { flex-basis: 35%; }
+    #legend { gap: 14px; }
+}
